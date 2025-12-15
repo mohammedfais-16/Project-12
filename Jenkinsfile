@@ -35,9 +35,6 @@ pipeline {
     }
 
     post {
-        always {
-            cleanWs()
-        }
         success {
             echo '✅ Build & Deployment Successful'
         }
