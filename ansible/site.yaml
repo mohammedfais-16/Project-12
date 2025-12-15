@@ -1,0 +1,38 @@
+---
+- name: Deploy MovieTicket Application
+  hosts: all
+  become: yes
+  vars:
+    k8s_version: "1.28.0"
+    docker_version: "24.0"
+    jenkins_version: "2.414"
+  
+  tasks:
+    - name: Include common tasks
+      include_role:
+        name: common
+      tags: common
+    
+    - name: Install Docker
+      include_role:
+        name: docker
+      tags: docker
+    
+    - name: Install Kubernetes
+      include_role:
+        name: k8s
+      when: "'kubernetes' in group_names"
+      tags: k8s
+    
+    - name: Deploy Jenkins
+      include_role:
+        name: jenkins
+      when: "'jenkins' in group_names"
+      tags: jenkins
+    
+    - name: Deploy Application to Kubernetes
+      include_role:
+        name: k8s-deploy
+      when: "'kubernetes' in group_names"
+      tags: deploy
+

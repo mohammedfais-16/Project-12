@@ -1,0 +1,56 @@
+---
+- name: Add Jenkins repository key
+  apt_key:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    state: present
+
+- name: Add Jenkins repository
+  apt_repository:
+    repo: "deb https://pkg.jenkins.io/debian-stable binary/"
+    state: present
+
+- name: Install Jenkins
+  apt:
+    name: jenkins
+    state: present
+    update_cache: yes
+
+- name: Start and enable Jenkins
+  systemd:
+    name: jenkins
+    enabled: yes
+    state: started
+
+- name: Install Docker in Jenkins
+  user:
+    name: jenkins
+    groups: docker
+    append: yes
+
+- name: Install kubectl for Jenkins
+  get_url:
+    url: https://dl.k8s.io/release/v1.28.0/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+
+- name: Wait for Jenkins to be ready
+  uri:
+    url: "http://localhost:8080"
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 30
+  delay: 10
+  ignore_errors: yes
+
+- name: Get Jenkins initial admin password
+  slurp:
+    src: /var/lib/jenkins/secrets/initialAdminPassword
+  register: jenkins_password
+
+- name: Display Jenkins setup info
+  debug:
+    msg:
+      - "Jenkins is running on http://{{ ansible_default_ipv4.address }}:8080"
+      - "Initial admin password: {{ jenkins_password.content | b64decode | trim }}"
+
