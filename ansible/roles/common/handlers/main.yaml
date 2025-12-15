@@ -1,6 +1,0 @@
----
-- name: restart system
-  reboot:
-    msg: "Rebooting after system updates"
-    reboot_timeout: 300
-

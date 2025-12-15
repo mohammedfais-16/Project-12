@@ -6,9 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production && \
-    npm cache clean --force
-
+npm install prom-client
 # Stage 2: Production
 FROM node:18-alpine AS runner
 WORKDIR /app
