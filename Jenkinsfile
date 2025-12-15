@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/mohammedfais-16/Movie-booking.git'
+                git branch: 'main',
+                url: 'https://github.com/mohammedfais-16/Movie-booking.git'
             }
         }
 
@@ -34,7 +35,14 @@ pipeline {
     }
 
     post {
-        success { echo '✅ Deployment Successful' }
-        failure { echo '❌ Deployment Failed' }
+        always {
+            cleanWs()
+        }
+        success {
+            echo '✅ Build & Deployment Successful'
+        }
+        failure {
+            echo '❌ Build Failed'
+        }
     }
 }
