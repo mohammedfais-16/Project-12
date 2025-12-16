@@ -3,7 +3,10 @@ kind: Deployment
 metadata:
   name: backend
 spec:
-  replicas: 2
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
   template:
     metadata:
       labels:
@@ -11,7 +14,6 @@ spec:
     spec:
       containers:
       - name: backend
-        image: your_dockerhub/backend-app
-        env:
-        - name: MONGO_URL
-          value: mongodb://mongo:27017/appdb
+        image: faisal1607/backend-app:latest
+        ports:
+        - containerPort: 5000

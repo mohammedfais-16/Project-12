@@ -4,6 +4,9 @@ metadata:
   name: mongo
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
   template:
     metadata:
       labels:
@@ -12,3 +15,5 @@ spec:
       containers:
       - name: mongo
         image: mongo:6
+        ports:
+        - containerPort: 27017
