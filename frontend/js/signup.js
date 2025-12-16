@@ -34,7 +34,7 @@ async function handleSignup(e) {
     }
 
     try {
-        const response = await fetch('http://localhost:3000/api/auth/signup', {
+        fetch(`${API_BASE_URL}/auth/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -67,4 +67,5 @@ function clearErrors() {
         el.textContent = '';
     });
 }
+
 
