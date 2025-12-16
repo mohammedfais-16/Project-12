@@ -1,45 +1,47 @@
+
 pipeline {
-    agent any
+  agent any
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main',
-                url: 'https://github.com/mohammedfais-16/Movie-booking.git'
-            }
-        }
+  environment {
+    DOCKERHUB_USER = "faisal1607"
+    FRONTEND_IMAGE = "frontend-app"
+    BACKEND_IMAGE = "backend-app"
+  }
 
-        stage('Build Docker Images') {
-            steps {
-                sh 'docker-compose build'
-            }
-        }
+  stages {
 
-        stage('Deploy Application') {
-            steps {
-                sh '''
-                docker-compose down || true
-                docker-compose up -d
-                '''
-            }
-        }
-
-        stage('Health Check') {
-            steps {
-                sh '''
-                sleep 15
-                curl -f http://localhost || exit 1
-                '''
-            }
-        }
+    stage('Checkout') {
+      steps {
+        git 'https://github.com/mohammedfais-16/Project-12'
+      }
     }
 
-    post {
-        success {
-            echo '✅ Build & Deployment Successful'
-        }
-        failure {
-            echo '❌ Build Failed'
-        }
+    stage('Build Images') {
+      steps {
+        sh '''
+        docker build -t $DOCKERHUB_USER/$FRONTEND_IMAGE ./frontend
+        docker build -t $DOCKERHUB_USER/$BACKEND_IMAGE ./backend
+        '''
+      }
     }
+
+    stage('Push Images') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+          sh '''
+          docker login -u $USER -p $PASS
+          docker push $DOCKERHUB_USER/$FRONTEND_IMAGE
+          docker push $DOCKERHUB_USER/$BACKEND_IMAGE
+          '''
+        }
+      }
+    }
+
+    stage('Deploy to Kubernetes') {
+  steps {
+    sh 'kubectl apply -f k8s/'
+  }
+}
+
+  }
 }
