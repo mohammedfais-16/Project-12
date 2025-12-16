@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
-const connectDB = async () => {
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/movieticket';
+const MONGO_URI =  process.env.MONGO_URL || "mongodb://mongo:27017/movieticket";
     
     const options = {
         maxPoolSize: 10,
